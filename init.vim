@@ -1,6 +1,6 @@
-
-let mapleader=","
+let mapleader=" "
 set number
+tnoremap <Esc> <C-\><C-n>
 call plug#begin('~/.vim/plugged')
 
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
@@ -8,7 +8,11 @@ Plug 'junegunn/fzf.vim'
 
 Plug 'neoclide/coc.nvim', { 'branch': 'release' }
 Plug 'easymotion/vim-easymotion'
-Plug 'vim-scripts/cpp_doxygen'
+Plug 'vim-scripts/DoxygenToolkit.vim'
+Plug 'airblade/vim-gitgutter'
+Plug 'tpope/vim-fugitive'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-scripts/DoxyGen-Syntax'
 
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
@@ -30,6 +34,7 @@ let g:EasyMotion_do_mapping = 0 " Disable default mappings
 nmap s <Plug>(easymotion-overwin-f)
 " " Turn on case-insensitive feature
 let g:EasyMotion_smartcase = 1
+let g:airline#extensions#tabline#enabled = 1
 "
 " " JK motions: Line motions
 map <Leader>j <Plug>(easymotion-j)
@@ -44,4 +49,9 @@ nnoremap <silent> <space>e :<C-u>CocList extensions<cr>
 
 call plug#end()
 
+nmap <leader>c :Gcommit<cr>
+nmap <leader>p :Gpush<cr>
+nmap <leader>w :Gwrite<cr>
+nmap <leader>d :Dox<cr>
+let $FZF_DEFAULT_COMMAND = 'ag -g ""'
 

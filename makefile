@@ -1,5 +1,5 @@
 upload:
 	mkdir -p ~/.config/nvim
 	cp init.vim ~/.config/nvim
-update:
+download:
 	cp ~/.config/nvim/init.vim .
