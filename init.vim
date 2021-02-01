@@ -7,30 +7,37 @@ set hidden
 call plug#begin('~/.vim/plugged')
 
 Plug 'easymotion/vim-easymotion'
-Plug 'vim-scripts/DoxygenToolkit.vim'
 Plug 'tpope/vim-fugitive'
-Plug 'vim-scripts/DoxyGen-Syntax'
 Plug 'rafi/awesome-vim-colorschemes'
 Plug 'skywind3000/asyncrun.vim'
-Plug 'bling/vim-bufferline'
-Plug 'wikitopian/hardmode'
-Plug 'rust-lang/rust.vim'
-Plug 'Yggdroot/indentLine',{ 'for': 'cpp' }
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'SirVer/ultisnips'
+Plug 'rust-lang/rust.vim'
 Plug 'liuchengxu/vim-clap', { 'do': ':Clap install-binary!' }
+Plug 'mileszs/ack.vim'
+Plug 'maxbrunsfeld/vim-yankstack'
+Plug 'mg979/vim-visual-multi'
 Plug 'lervag/vimtex'
-
+Plug 'itchyny/lightline.vim'
+let g:yankstack_yank_keys = ['y', 'd']
 
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+
 let g:indentLine_char = '|'
 let g:UltiSnipsExpandTrigger="<C-s>"
+if executable('ag')
+  let g:ackprg = 'ag --vimgrep'
+endif
 
-nmap cs :Snippets<cr>
+imap jj <Esc>
+tmap jj <C-\><C-n>
+imap ;; <C-c> 
+nmap cs :Clap snippets<cr>
 nmap cp :Clap files<cr>
 nmap cb :Clap buffers<cr>
 nmap cl :Clap lines<cr>
+nmap ci :Gissues<cr>
 nmap ca <Plug>(easymotion-overwin-f)
 nmap s <Plug>(easymotion-overwin-f)
 nmap S <Plug>(easymotion-overwin-line)
@@ -40,10 +47,22 @@ nmap ce :Gwrite<cr>
 nmap c1 :Dox<cr>
 nmap cx :call OpenTerminalOwn("")<Left><Left>
 nmap ch :Clap commits<cr>
+nmap cy <Plug>yankstack_substitute_older_paste
+nmap cY <Plug>yankstack_substitute_newer_paste
+nnoremap P <Plug>yankstack_substitute_older_paste
+nmap [g <Plug>(coc-git-prevchunk)
+nmap ]g <Plug>(coc-git-nextchunk)
+nmap gcu :CocCommand git.chunkUndo<cr>
+nmap gls :Gstatus<cr>
+nmap gli <Plug>(coc-git-chunkinfo)
+" show commit contains current position
+nmap glc <Plug>(coc-git-commit)
+nmap glo :CocCommand git.browserOpen<cr>
 
-autocmd VimEnter *
-  \ let &statusline='%{bufferline#refresh_status()}'
-  \ .bufferline#get_status_string()
+" navigate conflicts of current buffer
+nmap cn <Plug>(coc-git-prevconflict)
+nmap cN <Plug>(coc-git-nextconflict)
+" show chunk diff at current position
 
 function! OnExitJob(channel_id,data,stream_name)
   execute 'buffer' . g:allu_bufnr
@@ -83,7 +102,6 @@ call plug#end()
 
 let $FZF_DEFAULT_COMMAND = 'rg --files '
 
-set textwidth=80
 set tabstop=2
 set shiftwidth=2
 set softtabstop=2
@@ -92,20 +110,9 @@ set noshiftround
 set updatetime=300
 set shortmess+=c
 set smartcase
-colo molokai 
+colo minimalist
 let g:UltiSnipsJumpForwardTrigger="<c-b>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
-
-
-autocmd BufNewFile,BufRead *.cpp set syntax=cpp.doxygen
-autocmd BufNewFile,BufRead *.cc set syntax=cpp.doxygen
-autocmd BufNewFile,BufRead *.h set syntax=cpp.doxygen
-autocmd BufNewFile,BufRead *.hpp set syntax=cpp.doxygen
-
-
-let g:bufferline_modified = '[+]'
-let g:bufferline_echo = 0
-
 
 
 
@@ -115,10 +122,6 @@ set hidden
 " Some servers have issues with backup files, see #649.
 set nobackup
 set nowritebackup
-
-" Give more space for displaying messages.
-set cmdheight=2
-let g:tex_flavor='latex'
 
 " Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
 " delays and poor user experience.
