@@ -356,7 +356,7 @@ Mapper.map('n','<leader>l',":Lines<cr>",{silent = true, noremap = true}, "Search
 Mapper.map('n','s',"<Plug>(easymotion-overwin-f)",{silent = true, noremap = false}, "Jump to character","easymotion_overwin_f","Jumping to any single character on the screen with easy motion.")
 Mapper.map('n','S',"<Plug>(easymotion-overwin-line)",{silent = true, noremap = false}, "Jump to line","easymotion_overwin_line","Jumping to any line in the open windows with easy motion.")
 Mapper.map('n','<leader>c',":Gcommit<cr>",{silent = true, noremap = true}, "Commit git changes", "git_commit","Commiting the current changes in git with the fugitive plugin.")
-Mapper.map('n','<leader>gp',":Gpush<cr>",{silent = true, noremap = true}, "Push git commits","git_push","Pushing the current state to the upstream repository.")
+Mapper.map('n','<leader>gp',":Gpush<cr>",{silent = false, noremap = true}, "Push git commits","git_push","Pushing the current state to the upstream repository.")
 Mapper.map('n','<leader>f',":Telescope live_grep<cr>",{silent = true, noremap = true}, "Search strings in files", "live_grep","Matching the string in every file in the working directory.")
 Mapper.map('n','<leader>h',":Telescope mapper<cr>",{silent = true, noremap = true}, "Show keymappings", "show_help","Show this keymapping help to support the user of this config file.")
 Mapper.map('n','<leader>ss',":Telescope git_status<cr>",{silent = true, noremap = true}, "Search git diff","show_status","Show fuzzy search of the git status and shows a preview of the diff file.")
@@ -376,8 +376,8 @@ Mapper.map('n','<leader>N',"<cmd>lua require\"gitsigns.actions\".prev_hunk()<CR>
 Mapper.map('n','<leader>d',"<cmd>lua vim.lsp.diagnostic.goto_next({enable_popup=false})<CR>",{silent = true, noremap = true}, "Next diagnostic","diag_next","Jump to the next diagnostic message.")
 Mapper.map('n','<leader>D',"<cmd>lua vim.lsp.diagnostic.goto_prev({enable_popup=false})<CR>",{silent = true, noremap = true}, "Previous diagnostic","diag_prev","Jump to the previous diagnostic message.")
 Mapper.map('n','<leader>v',":Trouble<CR>",{silent = true, noremap = true}, "Show diagnostics","diag_nice_show","Show the file diagnostics in a file preview.")
-Mapper.map('n','<leader>w',":Frisk ",{silent = true, noremap = true}, "Browser search for word","browser_search","Search the web for a specific term.")
-Mapper.map('v','<leader>w',":'<,'>Frisk<cr>",{silent = true, noremap = false}, "Browser search for selection","browser_search_3","Search the web for the text selected with visual mode.")
+Mapper.map('n','<leader>w',":Frisk ",{silent = false, noremap = true}, "Browser search for word","browser_search","Search the web for a specific term.")
+Mapper.map('v','<leader>w',":'<,'>Frisk<cr>",{silent = false, noremap = false}, "Browser search for selection","browser_search_3","Search the web for the text selected with visual mode.")
 EOF
 
 lua << EOF
@@ -759,3 +759,4 @@ require('feline').setup({
 })
 EOF
 set showcmd
+hi MsgArea guifg=#ffa420
