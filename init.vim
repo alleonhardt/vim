@@ -1,6 +1,3 @@
-" The code in this file is taken from various websites, blog posts, github
-" repositories. I do not claim to have written the code in this file and do
-" not take ownership. This file is for private use cases only!
 let mapleader=" "
 set number
 set encoding=utf-8
@@ -43,7 +40,7 @@ Plug 'lewis6991/gitsigns.nvim'
 Plug 'famiu/feline.nvim'
 Plug 'lukas-reineke/indent-blankline.nvim'
 Plug 'terrortylor/nvim-comment'
-Plug 'voldikss/vim-browser-search'
+Plug 'arecarn/vim-frisk'
 call plug#end()
 colo sonokai
 let g:rainbow_active = 1 "set to 0 if you want to enable it later via :RainbowToggle
@@ -334,6 +331,21 @@ let bufferline.icon_close_tab_modified = 'M'
 
 lua << EOF
 require("nvim-mapper").setup({})
+local actions = require('telescope.actions')
+-- Global remapping
+------------------------------
+require('telescope').setup({
+  defaults = {
+    mappings = {
+      i = {
+        ["<esc>"] = actions.close
+      }
+    }
+  }
+})
+
+
+
 require'telescope'.load_extension('mapper')
 Mapper = require("nvim-mapper")
 Mapper.map('i', 'jj', "<Esc>", {silent = true, noremap = true}, "Exit insert mode", "exit_insert", "Exit insert mode with another key mapping to speed up the process.")
@@ -364,9 +376,8 @@ Mapper.map('n','<leader>N',"<cmd>lua require\"gitsigns.actions\".prev_hunk()<CR>
 Mapper.map('n','<leader>d',"<cmd>lua vim.lsp.diagnostic.goto_next({enable_popup=false})<CR>",{silent = true, noremap = true}, "Next diagnostic","diag_next","Jump to the next diagnostic message.")
 Mapper.map('n','<leader>D',"<cmd>lua vim.lsp.diagnostic.goto_prev({enable_popup=false})<CR>",{silent = true, noremap = true}, "Previous diagnostic","diag_prev","Jump to the previous diagnostic message.")
 Mapper.map('n','<leader>v',":Trouble<CR>",{silent = true, noremap = true}, "Show diagnostics","diag_nice_show","Show the file diagnostics in a file preview.")
-Mapper.map('n','<leader>w',":BrowserSearch ",{silent = true, noremap = true}, "Browser search for word","browser_search","Search the web for a specific term.")
-Mapper.map('n','<leader>z',"<Plug>SearchNormal",{silent = true, noremap = false}, "Browser search for word","browser_search_2","Search the web for the text selected with text mode.")
-Mapper.map('v','<leader>z',"<Plug>SearchVisual",{silent = true, noremap = false}, "Browser search for word","browser_search_3","Search the web for the text selected with visual mode.")
+Mapper.map('n','<leader>w',":Frisk ",{silent = true, noremap = true}, "Browser search for word","browser_search","Search the web for a specific term.")
+Mapper.map('v','<leader>w',":'<,'>Frisk<cr>",{silent = true, noremap = false}, "Browser search for selection","browser_search_3","Search the web for the text selected with visual mode.")
 EOF
 
 lua << EOF
