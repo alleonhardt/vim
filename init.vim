@@ -10,11 +10,14 @@ Plug 'neovim/nvim-lspconfig'
 Plug 'nvim-lua/lsp_extensions.nvim'
 Plug 'rafi/awesome-vim-colorschemes'
 Plug 'skywind3000/asyncrun.vim'
+Plug 'kyazdani42/nvim-web-devicons'
 Plug 'rust-lang/rust.vim'
 Plug 'mg979/vim-visual-multi'
 Plug 'lervag/vimtex'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'honza/vim-snippets'
+Plug 'mrjones2014/lighthaus.nvim'
+Plug 'famiu/feline.nvim'
 
 Plug 'hrsh7th/nvim-cmp'
 " Plug 'hrsh7th/vim-vsnip'
@@ -22,6 +25,7 @@ Plug 'hrsh7th/cmp-look'
 Plug 'hrsh7th/cmp-buffer'
 Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/cmp-nvim-lsp'
+Plug 'lukas-reineke/cmp-rg'
 " Plug 'hrsh7th/cmp-vsnip'
 Plug 'SirVer/ultisnips'
 Plug 'quangnguyen30192/cmp-nvim-ultisnips'
@@ -29,6 +33,7 @@ Plug 'rafamadriz/friendly-snippets'
 Plug 'weirongxu/plantuml-previewer.vim'
 Plug 'tyru/open-browser.vim'
 
+Plug 'akinsho/flutter-tools.nvim'
 Plug 'junegunn/fzf.vim'
 Plug 'wellle/targets.vim'
 Plug 'camspiers/animate.vim'
@@ -38,6 +43,7 @@ Plug 'nvim-lua/plenary.nvim'
 Plug 'folke/todo-comments.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " We recommend updating the parsers on update
+Plug 'SmiteshP/nvim-gps'
 Plug 'ggvgc/vim-fuzzysearch'
 Plug 'folke/trouble.nvim'
 Plug 'lazytanuki/nvim-mapper'
@@ -45,14 +51,13 @@ Plug 'mbbill/undotree'
 Plug 'lewis6991/gitsigns.nvim'
 Plug 'phaazon/hop.nvim'
 Plug 'ShadowItaly/octo.nvim', { 'branch': 'fix_key_mappings_error' }
-Plug 'famiu/feline.nvim'
 Plug 'terrortylor/nvim-comment'
 Plug 'arecarn/vim-frisk'
 Plug 'kdheepak/lazygit.nvim'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-eunuch'
 Plug 'lukas-reineke/indent-blankline.nvim'
-Plug 'voldikss/vim-floaterm'
+Plug 'numtostr/FTerm.nvim'
 Plug 't9md/vim-choosewin'
 Plug 'ggandor/lightspeed.nvim'
 Plug 'haringsrob/nvim_context_vt'
@@ -63,12 +68,13 @@ Plug 'kabouzeid/nvim-lspinstall'
 Plug 'vimwiki/vimwiki'
 Plug 'soywod/himalaya', {'rtp': 'vim'}
 Plug 'soywod/unfog.vim'
+Plug 'tpope/vim-fugitive'
 call plug#end()
 let g:vista#renderer#enable_icon = 0
 let g:vimwiki_map_prefix = '<leader>v'
 let g:vista_sidebar_width = 45
 let g:asyncrun_open = 15
-colo afterglow
+colo lighthaus_dark
 let g:rainbow_active = 1 "set to 0 if you want to enable it later via :RainbowToggle
 let g:choosewin_overlay_enable = 0
 let g:sneak#label = 1
@@ -77,6 +83,7 @@ let g:fuzzysearch_hlsearch = 1
 let g:fuzzysearch_ignorecase = 1
 let g:fuzzysearch_max_history = 30
 let g:fuzzysearch_match_spaces = 0
+
 
 " let g:indentLine_char = '|'
 if executable('ag')
@@ -103,6 +110,9 @@ set ignorecase
 
 
 lua <<EOF
+require'nvim-web-devicons'.setup {}
+require'FTerm'.setup{}
+require("flutter-tools").setup{}
 require'nvim-treesitter.configs'.setup {
   rainbow = {
     enable = true,
@@ -148,7 +158,7 @@ nvim_lsp.rust_analyzer.setup({
 -- Enable diagnostics
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
   vim.lsp.diagnostic.on_publish_diagnostics, {
-    virtual_text = false,
+    virtual_text = true,
     signs = true,
     update_in_insert = false,
   }
@@ -181,8 +191,6 @@ noremap <Left> <NOP>
 noremap <Right> <NOP>
 
 set cursorline
-
-
 " TextEdit might fail if hidden is not set.
 set hidden
 
@@ -209,19 +217,6 @@ lua << EOF
   signs = true, -- show icons in the signs column
   sign_priority = 8, -- sign priority
   -- keywords recognized as todo comments
-  keywords = {
-    FIX = {
-      icon = "F", -- icon used for the sign, and in search results
-      color = "error", -- can be a hex color, or a named color (see below)
-      alt = { "FIXME", "BUG", "FIXIT", "ISSUE" }, -- a set of other keywords that all map to this FIX keywords
-      -- signs = false, -- configure signs for some keywords individually
-    },
-    TODO = { icon = "T ", color = "info" },
-    HACK = { icon = "H", color = "warning" },
-    WARN = { icon = "W ", color = "warning", alt = { "WARNING", "XXX" } },
-    PERF = { icon = "P ", alt = { "OPTIM", "PERFORMANCE", "OPTIMIZE" } },
-    NOTE = { icon = "N ", color = "hint", alt = { "INFO" } },
-  },
   merge_keywords = true, -- when true, custom keywords will be merged with the defaults
   -- highlighting of the line containing the todo comment
   -- * before: highlights before the keyword (typically comment characters)
@@ -313,27 +308,14 @@ let g:netrw_liststyle=3
 " that's better than 'cd ../path' which change in all tabs
 lua << EOF
   require("trouble").setup {
-    fold_open = "v", -- icon used for open folds
-    fold_closed = ">", -- icon used for closed folds
-    icons=false,
+    icons=true,
     indent_lines = false, -- add an indent guide below the fold icons
-    signs = {
-        -- icons / text used for a diagnostic
-        error = "error",
-        warning = "warn",
-        hint = "hint",
-        information = "info"
-    },
-    use_lsp_diagnostic_signs = false -- enabling this will use the signs defined in your lsp client
+    use_lsp_diagnostic_signs = true -- enabling this will use the signs defined in your lsp client
   }
 EOF
 let bufferline = get(g:, 'bufferline', {})
-let bufferline.icons = v:false
+let bufferline.icons = v:true
 let bufferline.clickable = v:false
-let bufferline.icon_separator_active = '|'
-let bufferline.icon_separator_inactive = '|'
-let bufferline.icon_close_tab = ''
-let bufferline.icon_close_tab_modified = 'M'
 
 lua << EOF
 require("nvim-mapper").setup({})
@@ -357,7 +339,9 @@ Mapper = require("nvim-mapper")
 Mapper.map('i', 'jj', "<Esc>", {silent = true, noremap = true}, "Exit insert mode", "exit_insert", "Exit insert mode with another key mapping to speed up the process.")
 Mapper.map('t','jj',"<C-\\><C-n>",{silent = true, noremap = true}, "Exit terminal insert mode", "exit_term_insert", "Exit the terminal insert mode with the same mapping as in the normal mode.")
 Mapper.map('n','<leader>p',":GFiles<cr>",{silent = true, noremap = true}, "Find files","fuzzy_find_files","Fuzzy searching for files in the current working directory.")
-Mapper.map('n','<leader>b',":FloatermNew broot<cr>",{silent = true, noremap = true}, "Open broot","fuzzy_find_buffer","Open broot")
+Mapper.map('n','<leader>b',":Buffers<cr>",{silent = true, noremap = true}, "Open fuzzy buffer finder","fuzzy_find_buffer","Open fzf buffers")
+Mapper.map('n','<leader>B',":FloatermNew broot<cr>",{silent = true, noremap = true}, "Open broot","fuzzy_find_broot","Open broot")
+Mapper.map('n','<leader>w',":HopWord<cr>",{silent = true, noremap = true}, "Open hop word","hop word","Open broot")
 Mapper.map('n','<leader>l',":Lines<cr>",{silent = true, noremap = true}, "Search open lines","fuzzy_find_lines","Fuzzy searching for through the lines in the buffer.")
 Mapper.map('n','<leader>g',":LazyGit<cr>",{silent = false, noremap = true}, "Open the git console","git_console","Open the git console for commiting and changing things.")
 Mapper.map('n','<leader>f',":Rg<cr>",{silent = true, noremap = true}, "Search strings in files", "live_grep","Matching the string in every file in the working directory.")
@@ -379,6 +363,8 @@ Mapper.map('n','<leader>n',"<cmd>lua require\"gitsigns.actions\".next_hunk()<CR>
 Mapper.map('n','<leader>N',"<cmd>lua require\"gitsigns.actions\".prev_hunk()<CR>",{silent = true, noremap = true}, "Previous git hunk","git_prev_hunk","Jump to the previous git hunk in the file.")
 Mapper.map('n','<leader>d',"<cmd>lua vim.lsp.diagnostic.goto_next({enable_popup=false})<CR>",{silent = true, noremap = true}, "Next diagnostic","diag_next","Jump to the next diagnostic message.")
 Mapper.map('n','<leader>D',"<cmd>lua vim.lsp.diagnostic.goto_prev({enable_popup=false})<CR>",{silent = true, noremap = true}, "Previous diagnostic","diag_prev","Jump to the previous diagnostic message.")
+Mapper.map('n','<F12>',"<cmd>lua require('FTerm').toggle()<CR>",{silent = false, noremap = true}, "Toogle floatterm","toggle_floatterm","Toggle float term.")
+Mapper.map('t','<F12>',"<cmd>lua require('FTerm').toggle()<CR>",{silent = false, noremap = true}, "Toogle floatterm","toggle_floatterm_term","Toggle float term.")
 Mapper.map('n','<leader>1',":Trouble<CR>",{silent = true, noremap = true}, "Show diagnostics","diag_nice_show","Show the file diagnostics in a file preview.")
 Mapper.map('n','<leader>v',":Vista<CR>",{silent = true, noremap = true}, "Show tagbar","diag_nice_vista","Show the file diagnostics in a file preview.")
 Mapper.map('n','$',":HopWord<cr>",{silent = false, noremap = false}, "Browser search for selection","browser_search_3","Search the web for the text selected with visual mode.")
@@ -390,6 +376,7 @@ Mapper.map('n','<leader>z',":FloatermNew --autoclose=2<CR>",{silent = false, nor
 Mapper.map('n','<leader>j',"<Plug>(choosewin)",{silent = false, noremap = false}, "Selects a window","window_picker","Selects a window with a character.")
 Mapper.map('n','<leader>k',":FuzzySearch<cr>",{silent = false, noremap = false}, "Selects a window","fuzzy_search","Selects a window with a character.")
 Mapper.map('n','<leader>i',":Octo issue list<cr>",{silent = false, noremap = false}, "Selects a window","issues","Selects a window with a character.")
+Mapper.map('n','<leader><leader>',":HopLine<cr>",{silent = false, noremap = false}, "Jumps to a specific line","line_hop","Jumps to a specific line on the screen.")
 require'hop'.setup()
 EOF
 highlight HopNextKey1 ctermfg=red guifg=red
@@ -460,265 +447,9 @@ require('gitsigns').setup {
   }
 }
 
--- require('feline').setup({
---     preset = 'noicon',
--- })
 EOF
 
 
-lua << EOF
-local lsp = require('feline.providers.lsp')
-local vi_mode_utils = require('feline.providers.vi_mode')
-
-local b = vim.b
-local fn = vim.fn
-
-local M = {
-    properties = {
-        force_inactive = {
-            filetypes = {},
-            buftypes = {},
-            bufnames = {}
-        }
-    },
-    components = {
-      active = {},
-      inactive = {}
-    }
-}
-
-table.insert(M.components.active,{})
-table.insert(M.components.active,{})
-table.insert(M.components.active,{})
-
-table.insert(M.components.inactive,{})
-table.insert(M.components.inactive,{})
-
-M.properties.force_inactive.filetypes = {
-    'packer',
-    'startify',
-    'fugitive',
-    'fugitiveblame',
-    'qf',
-    'help'
-}
-
-M.properties.force_inactive.buftypes = {
-    'terminal'
-}
-
-M.components.active[1][1] = {
-    provider = '> ',
-    hl = {
-        fg = 'skyblue'
-    }
-}
-
-M.components.active[1][2] = {
-    provider = 'vi_mode',
-    hl = function()
-        local val = {}
-
-        val.name = vi_mode_utils.get_mode_highlight_name()
-        val.fg = vi_mode_utils.get_mode_color()
-        val.style = 'bold'
-
-        return val
-    end,
-    right_sep = ' ',
-    icon = ''
-}
-
-M.components.active[1][3] = {
-    provider = 'file_info',
-    hl = {
-        fg = 'white',
-        bg = 'oceanblue',
-        style = 'bold'
-    },
-    left_sep = '',
-    right_sep = ' ',
-    icon = ''
-}
-
-M.components.active[1][4] = {
-    provider = 'file_size',
-    enabled = function() return fn.getfsize(fn.expand('%:p')) > 0 end,
-    right_sep = {
-        ' ',
-        {
-            str = 'vertical_bar_thin',
-            hl = {
-                fg = 'fg',
-                bg = 'bg'
-            }
-        },
-    }
-}
-
-M.components.active[1][5] = {
-    provider = 'position',
-    left_sep = ' ',
-    right_sep = {
-        ' ',
-        {
-            str = 'vertical_bar_thin',
-            hl = {
-                fg = 'fg',
-                bg = 'bg'
-            }
-        }
-    }
-}
-
-M.components.active[1][6] = {
-    provider = 'diagnostic_errors',
-    enabled = function() return lsp.diagnostics_exist('Error') end,
-    hl = { fg = 'red' },
-    icon = ' E-'
-}
-
-M.components.active[1][7] = {
-    provider = 'diagnostic_warnings',
-    enabled = function() return lsp.diagnostics_exist('Warning') end,
-    hl = { fg = 'yellow' },
-    icon = ' W-'
-}
-
-M.components.active[1][8] = {
-    provider = 'diagnostic_hints',
-    enabled = function() return lsp.diagnostics_exist('Hint') end,
-    hl = { fg = 'cyan' },
-    icon = ' H-'
-}
-
-M.components.active[1][9] = {
-    provider = 'diagnostic_info',
-    enabled = function() return lsp.diagnostics_exist('Information') end,
-    hl = { fg = 'skyblue' },
-    icon = ' I-'
-}
-
-M.components.active[3][1] = {
-    provider = function()
-      local result = vim.lsp.buf_get_clients()
-      local count = 0
-      for _ in pairs(result) do count = count + 1 end
-      if next(result) ~= nil then
-        return "LSP: " .. (result[0] or result[1]).name
-      else
-        return "LSP: none"
-      end
-
-    end,
-    hl = {
-        fg = 'red',
-        bg = 'black',
-        style = 'bold'
-    },
-    icon = ' ',
-    right_sep = {
-            str = ' |',
-            hl = {
-                fg = 'white',
-                bg = 'black'
-            }
-    }
-}
-
-M.components.active[3][2] = {
-    provider = 'git_branch',
-    hl = {
-        fg = 'white',
-        bg = 'black',
-        style = 'bold'
-    },
-    right_sep = function()
-        local val = {hl = {fg = 'NONE', bg = 'black'}}
-        if b.gitsigns_status_dict then val.str = ' ' else val.str = '' end
-
-        return val
-    end,
-    icon = ' '
-}
-
-M.components.active[3][3] = {
-    provider = 'git_diff_added',
-    hl = {
-        fg = 'green',
-        bg = 'black'
-    },
-    icon = ' +'
-}
-
-M.components.active[3][4] = {
-    provider = 'git_diff_changed',
-    hl = {
-        fg = 'orange',
-        bg = 'black'
-    },
-    icon = ' ~'
-}
-
-M.components.active[3][5] = {
-    provider = 'git_diff_removed',
-    hl = {
-        fg = 'red',
-        bg = 'black'
-    },
-    right_sep = function()
-        local val = {hl = {fg = 'NONE', bg = 'black'}}
-        if b.gitsigns_status_dict then val.str = ' ' else val.str = '' end
-
-        return val
-    end,
-    icon = ' -'
-}
-
-M.components.active[3][6] = {
-    provider = 'line_percentage',
-    hl = {
-        style = 'bold'
-    },
-    left_sep = '  ',
-    right_sep = ' '
-}
-
-
-M.components.inactive[1][1] = {
-    provider = 'file_type',
-    hl = {
-        fg = 'white',
-        bg = 'oceanblue',
-        style = 'bold'
-    },
-    left_sep = {
-        str = ' ',
-        hl = {
-            fg = 'NONE',
-            bg = 'oceanblue'
-        }
-    },
-    right_sep = {
-        {
-            str = ' ',
-            hl = {
-                fg = 'NONE',
-                bg = 'oceanblue'
-            }
-        },
-        ' '
-    }
-}
-
-require('feline').setup({
-    colors = M.colors,
-    separators = M.separators,
-    components = M.components,
-    force_inactive =  M.properties.force_inactive,
-    vi_mode_colors = M.vi_mode_colors
-})
-EOF
 set showcmd
 " vimrc
 
@@ -750,6 +481,7 @@ local cmp = require("cmp")
       { name = 'path' },
       { name = 'nvim_lsp' },
       { name = 'look' },
+      { name = 'rg' }
         -- more sources
       },
       -- Configure for <TAB> people
@@ -758,6 +490,7 @@ local cmp = require("cmp")
       -- - <TAB> to expand snippet when no completion item selected (you don't need to select the snippet from completion item to expand)
       -- - <C-space> to expand the selected snippet from completion menu
       mapping = {
+        ['<CR>'] = cmp.mapping.confirm(),
         ["<C-Space>"] = cmp.mapping(function(fallback)
           if vim.fn.pumvisible() == 1 then
             if vim.fn["UltiSnips#CanExpandSnippet"]() == 1 then
@@ -828,9 +561,9 @@ require('bufferline').setup({
     diagnostics_indicator = function(count, level, diagnostics_dict, context)
       return "("..count..")"
     end,
-    show_buffer_icons = false, -- disable filetype icons for buffers
-    show_buffer_close_icons = false,
-    show_close_icon = false,
+    show_buffer_icons = true, -- disable filetype icons for buffers
+    show_buffer_close_icons = true,
+    show_close_icon = true,
     show_tab_indicators = false,
     persist_buffer_sort = true, -- whether or not custom sorted buffers should persist
     separator_style = {'|','|'},
@@ -856,7 +589,7 @@ lua << EOF
   snippet_context_lines = 4;               -- number or lines around commented lines
   file_panel = {
     size = 10,                             -- changed files panel rows
-    use_icons = false                       -- use web-devicons in file panel
+    use_icons = true -- use web-devicons in file panel
   },
   mappings = {
     issue = {
@@ -980,7 +713,191 @@ smap <expr> KK vsnip#jumpable(-1)  ? '<Plug>(vsnip-jump-prev)'      : '<S-Tab>'
 imap <c-x><c-l> <plug>(fzf-complete-line)
 map <tab> <c-w>w
 let g:preview_uml_url='http://localhost:8888'
-let g:floaterm_keymap_new    = '<F7>'
-let g:floaterm_keymap_prev   = '<F8>'
-let g:floaterm_keymap_next   = '<F9>'
-let g:floaterm_keymap_toggle = '<F12>'
+
+lua << EOF
+require("nvim-gps").setup()
+local vi_mode_utils = require('feline.providers.vi_mode')
+
+local M = {
+    active = {},
+    inactive = {}
+}
+
+M.active[1] = {
+    {
+        provider = '▊ ',
+        hl = {
+            fg = 'darkmagenta'
+        }
+    },
+    {
+        provider = 'vi_mode',
+        hl = function()
+            return {
+                name = vi_mode_utils.get_mode_highlight_name(),
+                fg = vi_mode_utils.get_mode_color(),
+                style = 'bold'
+            }
+        end,
+        right_sep = ' ',
+        icon=''
+    },
+    {
+        provider = 'file_info',
+        hl = {
+            fg = 'white',
+            bg = 'darkmagenta',
+            style = 'bold'
+        },
+        left_sep = {
+            ' ', 'slant_left_2',
+            {str = ' ', hl = {bg = 'darkmagenta', fg = 'NONE'}}
+        },
+        right_sep = {'slant_right_2', ' '}
+    },
+    {
+        provider = 'file_size',
+        right_sep = {
+            ' ',
+            {
+                str = 'slant_left_2_thin',
+                hl = {
+                    fg = 'fg',
+                    bg = 'bg'
+                }
+            },
+        }
+    },
+    {
+        provider = 'position',
+        left_sep = ' ',
+        right_sep = {
+            ' ',
+            {
+                str = 'slant_right_2_thin',
+                hl = {
+                    fg = 'fg',
+                    bg = 'bg'
+                }
+            }
+        }
+    },
+    {
+        provider = 'diagnostic_errors',
+        hl = { fg = 'red' }
+    },
+    {
+        provider = 'diagnostic_warnings',
+        hl = { fg = 'yellow' }
+    },
+    {
+        provider = 'diagnostic_hints',
+        hl = { fg = 'cyan' }
+    },
+    {
+        provider = 'diagnostic_info',
+        hl = { fg = 'skyblue' }
+    },
+    {
+  	  provider = function()
+		    return require("nvim-treesitter").statusline()
+	    end,
+      left_sep = '  ',
+      hl = {style='italic', bg='black'}
+    }
+}
+
+M.active[2] = {
+    {
+        provider = 'git_branch',
+        hl = {
+            fg = 'orange',
+            bg = 'black',
+            style = 'bold'
+        },
+        right_sep = {
+            str = ' ',
+            hl = {
+                fg = 'NONE',
+                bg = 'black'
+            }
+        }
+    },
+    {
+        provider = 'git_diff_added',
+        hl = {
+            fg = 'green',
+            bg = 'black'
+        }
+    },
+    {
+        provider = 'git_diff_changed',
+        hl = {
+            fg = 'orange',
+            bg = 'black'
+        }
+    },
+    {
+        provider = 'git_diff_removed',
+        hl = {
+            fg = 'red',
+            bg = 'black'
+        },
+        right_sep = {
+            str = ' ',
+            hl = {
+                fg = 'NONE',
+                bg = 'black'
+            }
+        }
+    },
+    {
+        provider = 'line_percentage',
+        hl = {
+            style = 'bold'
+        },
+        left_sep = '  ',
+        right_sep = ' '
+    },
+    {
+        provider = 'scroll_bar',
+        hl = {
+            fg = 'skyblue',
+            style = 'bold'
+        }
+    }
+}
+
+M.inactive[1] = {
+    {
+        provider = 'file_type',
+        hl = {
+            fg = 'white',
+            bg = 'oceanblue',
+            style = 'bold'
+        },
+        left_sep = {
+            str = ' ',
+            hl = {
+                fg = 'NONE',
+                bg = 'oceanblue'
+            }
+        },
+        right_sep = {
+            {
+                str = ' ',
+                hl = {
+                    fg = 'NONE',
+                    bg = 'oceanblue'
+                }
+            },
+            'slant_right'
+        }
+    },
+    -- Empty component to fix the highlight till the end of the statusline
+    {
+    }
+}
+
+require 'feline'.setup{components=M}
+EOF
