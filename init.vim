@@ -18,10 +18,12 @@ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'honza/vim-snippets'
 Plug 'mrjones2014/lighthaus.nvim'
 Plug 'famiu/feline.nvim'
+Plug 'kyazdani42/nvim-tree.lua'
+Plug 'nvim-lua/plenary.nvim'
 
 Plug 'hrsh7th/nvim-cmp'
 " Plug 'hrsh7th/vim-vsnip'
-Plug 'hrsh7th/cmp-look'
+Plug 'octaltree/cmp-look'
 Plug 'hrsh7th/cmp-buffer'
 Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/cmp-nvim-lsp'
@@ -32,6 +34,7 @@ Plug 'quangnguyen30192/cmp-nvim-ultisnips'
 Plug 'rafamadriz/friendly-snippets'
 Plug 'weirongxu/plantuml-previewer.vim'
 Plug 'tyru/open-browser.vim'
+Plug 'onsails/lspkind-nvim'
 
 Plug 'akinsho/flutter-tools.nvim'
 Plug 'junegunn/fzf.vim'
@@ -39,7 +42,7 @@ Plug 'wellle/targets.vim'
 Plug 'camspiers/animate.vim'
 Plug 'akinsho/nvim-bufferline.lua'
 Plug 'nvim-lua/popup.nvim'
-Plug 'nvim-lua/plenary.nvim'
+Plug 'petertriho/cmp-git'
 Plug 'folke/todo-comments.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  " We recommend updating the parsers on update
@@ -63,12 +66,13 @@ Plug 'ggandor/lightspeed.nvim'
 Plug 'haringsrob/nvim_context_vt'
 Plug 'liuchengxu/vista.vim'
 Plug 'p00f/nvim-ts-rainbow'
-Plug 'kyazdani42/nvim-tree.lua'
 Plug 'kabouzeid/nvim-lspinstall'
 Plug 'vimwiki/vimwiki'
 Plug 'soywod/himalaya', {'rtp': 'vim'}
 Plug 'soywod/unfog.vim'
 Plug 'tpope/vim-fugitive'
+Plug 'vim-test/vim-test'
+Plug 'rcarriga/vim-ultest', { 'do': ':UpdateRemotePlugins' }
 call plug#end()
 let g:vista#renderer#enable_icon = 0
 let g:vimwiki_map_prefix = '<leader>v'
@@ -100,6 +104,7 @@ set completeopt=menuone,noselect
 " Avoid showing message extra message when using completion
 set shortmess+=c
 let g:himalaya_mailbox_picker = 'fzf'
+let test#strategy = "asyncrun_background"
 
 " binding.
 " " `s{char}{label}`
@@ -170,6 +175,53 @@ local servers = require'lspinstall'.installed_servers()
 for _, server in pairs(servers) do
   require'lspconfig'[server].setup{}
 end
+require'nvim-tree'.setup {
+  disable_netrw       = true,
+  hijack_netrw        = true,
+  open_on_setup       = false,
+  ignore_ft_on_setup  = {},
+  auto_close          = false,
+  open_on_tab         = false,
+  hijack_cursor       = false,
+  update_cwd          = false,
+  update_to_buf_dir   = {
+    enable = true,
+    auto_open = true,
+  },
+  diagnostics = {
+    enable = false,
+    icons = {
+      hint = "",
+      info = "",
+      warning = "",
+      error = "",
+    }
+  },
+  update_focused_file = {
+    enable      = false,
+    update_cwd  = false,
+    ignore_list = {}
+  },
+  system_open = {
+    cmd  = nil,
+    args = {}
+  },
+  filters = {
+    dotfiles = false,
+    custom = {}
+  },
+  view = {
+    width = 30,
+    height = 30,
+    hide_root_folder = false,
+    side = 'left',
+    auto_resize = false,
+    mappings = {
+      custom_only = false,
+      list = {}
+    }
+  }
+}
 EOF
 
 
@@ -259,17 +311,26 @@ EOF
 
 lua <<EOF
 require'nvim-treesitter.configs'.setup {
-  ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
-  ignore_install = { "javascript" }, -- List of parsers to ignore installing
-  highlight = {
-    enable = true,              -- false will disable the whole extension
-    disable = {},  -- list of language that will be disabled
-    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-    -- Using this option may slow down your editor, and you may see some duplicate highlights.
-    -- Instead of true it can also be a list of languages
-    additional_vim_regex_highlighting = false,
+ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+ignore_install = {}, -- List of parsers to ignore installing
+highlight = {
+enable = true,              -- false will disable the whole extension
+disable = {},  -- list of language that will be disabled
+-- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+-- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+-- Using this option may slow down your editor, and you may see some duplicate highlights.
+-- Instead of true it can also be a list of languages
+additional_vim_regex_highlighting = false,
+},
+incremental_selection = {
+enable = true,
+keymaps = {
+  init_selection = "gnn",
+  node_incremental = "grn",
+  scope_incremental = "grc",
+  node_decremental = "grm",
   },
+},
 }
 EOF
 " http://blog.trk.in.rs/2015/12/01/vim-tips/
@@ -377,6 +438,7 @@ Mapper.map('n','<leader>j',"<Plug>(choosewin)",{silent = false, noremap = false}
 Mapper.map('n','<leader>k',":FuzzySearch<cr>",{silent = false, noremap = false}, "Selects a window","fuzzy_search","Selects a window with a character.")
 Mapper.map('n','<leader>i',":Octo issue list<cr>",{silent = false, noremap = false}, "Selects a window","issues","Selects a window with a character.")
 Mapper.map('n','<leader><leader>',":HopLine<cr>",{silent = false, noremap = false}, "Jumps to a specific line","line_hop","Jumps to a specific line on the screen.")
+Mapper.map('n','<leader>e',":NvimTreeToggle<cr>",{silent = false, noremap = false}, "Opens the file viewer","file_explorer","Opens the file explorer to view the folder structure.")
 require'hop'.setup()
 EOF
 highlight HopNextKey1 ctermfg=red guifg=red
@@ -459,6 +521,7 @@ let g:UltiSnipsJumpBackwardTrigger="<c-p>"
 
 
 lua << EOF
+local lspkind = require('lspkind')
 local cmp = require("cmp")
     local t = function(str)
       return vim.api.nvim_replace_termcodes(str, true, true, true)
@@ -481,9 +544,13 @@ local cmp = require("cmp")
       { name = 'path' },
       { name = 'nvim_lsp' },
       { name = 'look' },
-      { name = 'rg' }
+      { name = 'rg' },
+      { name = 'cmp_git'}
         -- more sources
       },
+  formatting = {
+    format = lspkind.cmp_format({with_text = true, maxwidth = 50})
+  },
       -- Configure for <TAB> people
       -- - <TAB> and <S-TAB>: cycle forward and backward through autocompletion items
       -- - <TAB> and <S-TAB>: cycle forward and backward through snippets tabstops and placeholders
@@ -538,6 +605,20 @@ local cmp = require("cmp")
       },
     })
   vim.g.UltiSnipsRemoveSelectModeMappings = 0
+require("cmp_git").setup({
+    -- defaults
+    filetypes = { "gitcommit" },
+    github = {
+        issues = {
+            filter = "all", -- assigned, created, mentioned, subscribed, all, repos
+            limit = 100,
+            state = "open", -- open, closed, all
+        },
+        mentions = {
+            limit = 100,
+        },
+    },
+})
 EOF
 
 lua << EOF
@@ -799,8 +880,13 @@ M.active[1] = {
         hl = { fg = 'skyblue' }
     },
     {
-  	  provider = function()
-		    return require("nvim-treesitter").statusline()
+  	  provider = function(component)
+		    result = require("nvim-treesitter").statusline()
+        if result == nil then
+          return ""
+        else
+          return result
+        end
 	    end,
       left_sep = '  ',
       hl = {style='italic', bg='black'}
